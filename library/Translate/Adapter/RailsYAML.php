@@ -24,12 +24,12 @@ class Translate_Adapter_RailsYaml extends Zend_Translate_Adapter {
     /**
      * Load translation data
      *
-     * @param  string|array  $filename  Filename and full path to the translation source
+     * @param  string|array  $data  Filename and full path to the translation source
      * @param  string        $locale    Locale/Language to add data for, identical with locale identifier,
      *                                  see Zend_Locale for more information
      * @param  array         $option    OPTIONAL Options to use
      */
-    protected function _loadTranslationData($filename, $locale, array $options = array())
+    protected function _loadTranslationData($data, $locale, array $options = array())
     {   
         $options = array_merge($this->_options, $options);
 
@@ -37,16 +37,18 @@ class Translate_Adapter_RailsYaml extends Zend_Translate_Adapter {
             $this->_translate[$locale] = array();
         }
 
-        $this->_filename = $filename;
+        if(is_array($data)) return array($locale => $data);
+
+        $this->_filename = $data;
         if (!is_readable($this->_filename)) {
             require_once 'Zend/Translate/Exception.php';
-            throw new Zend_Translate_Exception('Error opening translation file \'' . $filename . '\'.');
+            throw new Zend_Translate_Exception('Error opening translation file \'' . $this->_filename . '\'.');
         }
 
         $content = sfYaml::load(file_get_contents($this->_filename));
         if($locale != 'auto' && !array_key_exists($locale, $content)) {
             require_once 'Zend/Translate/Exception.php';
-            throw new Zend_Translate_Exception(sprintf('Locale "%s" not found in file %s', $locale, $filename));
+            throw new Zend_Translate_Exception(sprintf('Locale "%s" not found in file %s', $locale, $this->_filename));
         }
 
         // Rails YML files supported arbitrarily nested keys, Zend_Translate doesn't - so we flatten them.
