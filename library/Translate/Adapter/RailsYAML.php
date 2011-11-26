@@ -54,9 +54,11 @@ class Translate_Adapter_RailsYaml extends Zend_Translate_Adapter {
         // Rails YML files supported arbitrarily nested keys, Zend_Translate doesn't - so we flatten them.
         // See http://stackoverflow.com/questions/7011451/transaprently-flatten-an-array/7011675
         $flattened = array();
-        $iterator = new Translate_Adapter_RailsYaml_Iterator(new RecursiveArrayIterator($content[$locale]));
-        foreach($iterator as $k => $v) {
-            $flattened[implode($options['keyDelimiter'], $iterator->getKeyStack())] = $v;
+        if($content[$locale]) {
+            $iterator = new Translate_Adapter_RailsYaml_Iterator(new RecursiveArrayIterator($content[$locale]));
+            foreach($iterator as $k => $v) {
+                $flattened[implode($options['keyDelimiter'], $iterator->getKeyStack())] = $v;
+            }
         }
 
         return array($locale => $flattened);
